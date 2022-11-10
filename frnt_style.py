@@ -92,6 +92,8 @@ if search_by == 'EmployeeName':
             st.error('Please give proper input')
         else:
             details(emp_inp, search_by)
+            if st.button("Update All"):
+                pass
 
 else:
     emp_inp = st.selectbox("Enter Employee details", ids)
@@ -100,6 +102,8 @@ else:
             st.error('Please give proper input')
         else:
             details(emp_inp, search_by)
+            if st.button("Update All"):
+                pass
 
 
 
