@@ -3,6 +3,7 @@ import streamlit as st
 from PIL import Image
 import datetime as dt
 from dataupdate import Update
+from dateutil import relativedelta
 
 icon = Image.open('tslogo.jpg')
 
@@ -127,16 +128,17 @@ def details(emp_inp, search_by):
         print(Exception)
         print('An erroe occured in if else block')
     st.write(emp_det)
-
-    lis = ['EmployeeName', 'EmployeeID']  # ,'Bench Days','Status']
+    #diff = relativedelta.relativedelta(dt.datetime.now(), join_date[0])
+    #tenure_date = str(diff.years) + "y/" + str(diff.months) + "m/" + str(diff.days) + 'd'
+    lis = ['EmployeeName', 'EmployeeID','Status','Tenure',"Utilization"]  # ,'Bench Days','Status']
     for i in emp_det:
         if i == 'Bench Days':
             st.write((i), ":", int(bench_days))
             st.write('Project1 days:', proj1_days)
             st.write('Project2 days:', proj2_days)
             st.write("Project3 days", proj3_days)
-            st.write('Status:', status)
-            break
+            # st.write('Status:', status)
+            # st.write("Tenure:",tenure_date)
         else:
             try:
                 if i in lis:
@@ -163,7 +165,8 @@ if search_by == 'EmployeeName':
             obj.all_col()
             st.success('you updated all bench days')
         except:
-            print('except')
+            print('Exception at bench days class calling 1')
+
 elif search_by == "Project_1_going":
     emp_inp = st.selectbox("Enter Employee details", clint1_going_on)
     if st.button('Submit'):
@@ -176,7 +179,7 @@ elif search_by == "Project_1_going":
             obj.all_col()
             st.success('you updated all bench days')
         except:
-            print('Except in Bench days class calling')
+            print('Except in Bench days class calling 2')
 elif search_by == "Project_2_going":
     emp_inp = st.selectbox("Enter Employee details", clint2_going_on)
     if st.button('Submit'):
@@ -189,7 +192,7 @@ elif search_by == "Project_2_going":
             obj.all_col()
             st.success('you updated all bench days')
         except:
-            print('Except in Bench days class calling')
+            print('Except in Bench days class calling 3')
 elif search_by == "Project_3_going":
     emp_inp = st.selectbox("Enter Employee details", clint3_going_on)
     if st.button('Submit'):
@@ -202,7 +205,7 @@ elif search_by == "Project_3_going":
             obj.all_col()
             st.success('you updated all bench days')
         except:
-            print('Except in Bench days class calling')
+            print('Except in Bench days class calling 4')
 elif search_by == "Complete_Bench":
     emp_inp = st.selectbox("Enter Employee details", comlete_bench)
     if st.button('Submit'):
@@ -215,7 +218,7 @@ elif search_by == "Complete_Bench":
             obj.all_col()
             st.success('you updated all bench days')
         except:
-            print('Except in Bench days class calling')
+            print('Except in Bench days class calling 5')
 
 
 else:
@@ -230,7 +233,7 @@ else:
             obj.all_col()
             st.success('you updated all bench days')
         except:
-            print('Except in Bench days class calling')
+            print('Except in Bench days class calling 6')
 
 
 

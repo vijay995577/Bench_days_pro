@@ -1,5 +1,9 @@
+import pandas
 import pandas as pd
 import datetime as dt
+
+import streamlit
+from dateutil import relativedelta
 data=pd.read_excel("demo2.xlsx")
 #data = pd.read_excel("demo2.xlsx")
 emp_names= list(data["EmployeeName"])
@@ -28,6 +32,7 @@ class Update:
                 status= "Bench"
                 proj1_days = 0
                 proj2_days = 0
+                proj3_days = 0
 
                 try:
                     if (join_date[0]) == 'None':
@@ -55,7 +60,7 @@ class Update:
                         print('4th if')
                         status = "Project 2"
                         proj1_days = (off_board_date_proj1[0] - on_board_date_proj1[0]).days
-                        proj2_days = (dt.datetime.now() - on_board_date_proj2[0])
+                        proj2_days = (dt.datetime.now() - on_board_date_proj2[0]).days
                         bench_days += (on_board_date_proj2[0] - off_board_date_proj1[0]).days
                         bench_days += (on_board_date_proj1[0] - join_date[0]).days
                     elif off_board_date_proj2[0] != 'None' and on_board_date_proj3[0] == 'None':
@@ -91,9 +96,26 @@ class Update:
                     print('Excepiton at if else blocks while bench days updating')
                     #print('An erroe occured in if else block')
 
-                data.at[i,'Bench Days']= int(bench_days)
+                # data.at[i,'Bench Days']= int(bench_days)
+                if join_date[0] != "None"   :
+                    diff = relativedelta.relativedelta(dt.datetime.now() ,join_date[0])
+                    tenure_date=str(diff.years)+"y/"+str(diff.months)+"m/"+str(diff.days)+'d'
+                    tenure_days = (dt.datetime.now() - join_date[0]).days
+                    uti_days = proj1_days + proj2_days +proj3_days
+                    uti_per = (uti_days/tenure_days) * 100
+                    data.at[i,'Tenure'] =  tenure_date
+                    data.at[i,"Utilization"]= str(round(uti_per))+"%"
+                    data.at[i, 'Bench Days'] = int(bench_days)
+                    data.at[i, 'Status'] = status
 
-                data.at[i,'Status'] = status
-        #   print(data.to_string())
-    #all_col()
+                else:
+                    data.at[i,'Tenure'] ="None"
+                    data.at[i, 'Utilization'] = "None"
+                    data.at[i,'Bench Days'] = "None"
+                    data.at[i, 'Status'] = "None"
+                    print('Add join date 1st')
+
+
+                # data.at[i,'Status'] = status
+        #print(data)
         data.to_excel("demo2.xlsx",index=False)
