@@ -1,191 +1,131 @@
+import pandas
 import pandas as pd
-import streamlit as st
-from PIL import Image
 import datetime as dt
-from dataupdate import Update
 
-icon = Image.open('tslogo.jpg')
+import streamlit
+from dateutil import relativedelta
+data=pd.read_excel("demo2.xlsx")
+#data = pd.read_excel("demo2.xlsx")
+emp_names= list(data["EmployeeName"])
 
-# streamlit page configration
-st.set_page_config(
-    page_icon=icon,
-    page_title='Employee Details',
-    layout="wide"
-)
+rows_length=(len(emp_names))
 
-# st.set_page_config(layout="wide")
-im = Image.open('thundersoft.png')
+class Update:
+    def all_col(self):
+        for i in range(rows_length):
+            if  i> rows_length:
+                break
+            else:
+                emp_name = emp_names[i]
+                emp_det = data.loc[data["EmployeeName"] == emp_name]
 
-excel_data = pd.read_excel("demo2.xlsx")
-name = list(excel_data["EmployeeName"])
-ids = list(excel_data['EmployeeID'])
-on_board_date_proj1 = list(excel_data['Project1 Onboard'])
-on_board_date_proj2 = list(excel_data['Project2 Onboard'])
-on_board_date_proj3 = list(excel_data['Project3 Onboard'])
-off_board_date_proj1 = list(excel_data['Project1 Offboarding'])
-off_board_date_proj2 = list(excel_data['Project2 Offboarding'])
-off_board_date_proj3 = list(excel_data['Project3 Offboarding'])
+                # accessing cols from excel
 
-# new_data=excel_data.loc[excel_data["Project1 Onboard"]=="None"]
-# print(new_data)
-# print(new_data["EmployeeName"])
+                on_board_date_proj1 = list(emp_det['Project1 Onboard'])
+                on_board_date_proj2 = list(emp_det['Project2 Onboard'])
+                on_board_date_proj3 = list(emp_det['Project3 Onboard'])
+                off_board_date_proj1 = list(emp_det['Project1 Offboarding'])
+                off_board_date_proj2 = list(emp_det['Project2 Offboarding'])
+                off_board_date_proj3 = list(emp_det['Project3 Offboarding'])
+                join_date = list(emp_det['Joining Date'])
 
+                bench_days = 0
+                status= "Bench"
+                proj1_days = 0
+                proj2_days = 0
+                proj3_days = 0
 
-indexs_1 = [i for i in range(len(on_board_date_proj1)) if on_board_date_proj1[i] == "None"]
-indexs_2 = [i for i in range(len(on_board_date_proj2)) if on_board_date_proj2[i] == "None"]
-indexs_3 = [i for i in range(len(on_board_date_proj3)) if on_board_date_proj3[i] == "None"]
+                # check each codintion to get the EMP details who have been in which project
+                try:
+                    if (join_date[0]) == 'None':
+                        print('0 if ')
+                        print('Candidate was not Onboarded till now')
 
+                    elif (on_board_date_proj1[0]) == "None":
+                        print('1st if')
+                        bench_days += (dt.datetime.now() - join_date[0]).days
 
+                    elif (off_board_date_proj1[0]) == 'None' and (on_board_date_proj1[0]) != "None":
+                        print('2nd if')
+                        status = "Project 1"
+                        proj1_days = (dt.datetime.now() - on_board_date_proj1[0]).days
 
-print(indexs_1)
-print(on_board_date_proj1)
-always_bench =[name[i] for i in indexs_1 ]
-proj1_goingon_names= [name[i] for i in range(len(name)) if i not in indexs_1]
-proj2_goingon_names=  [name[i] for i in range(len(name)) if i not in indexs_2]
-proj3_goingon_names= [name[i] for i in range(len(name)) if i not in indexs_3]
+                        # print(type(on_board_date_proj1[0]))
+                        bench_days += (on_board_date_proj1[0] - join_date[0]).days
+                    elif (off_board_date_proj1[0]) != "None" and (on_board_date_proj2[0]) == 'None':
+                        print('3RD IF')
+                        proj1_days = (off_board_date_proj1[0] - on_board_date_proj1[0]).days
+                        bench_days += (dt.datetime.now() - off_board_date_proj1[0]).days
+                        bench_days += (on_board_date_proj1[0] - join_date[0]).days()
+                        # print(bench_days)
+                    elif on_board_date_proj2[0] != "None" and off_board_date_proj2[0] == 'None':
+                        print('4th if')
+                        status = "Project 2"
+                        proj1_days = (off_board_date_proj1[0] - on_board_date_proj1[0]).days
+                        proj2_days = (dt.datetime.now() - on_board_date_proj2[0]).days
+                        bench_days += (on_board_date_proj2[0] - off_board_date_proj1[0]).days
+                        bench_days += (on_board_date_proj1[0] - join_date[0]).days
+                    elif off_board_date_proj2[0] != 'None' and on_board_date_proj3[0] == 'None':
+                        print('5th if')
+                        # bench_days += dt.datetime.now() - off_board_date_proj2[0]
+                        bench_days += (on_board_date_proj2[0].date() - off_board_date_proj1[0].date()).days
+                        bench_days += (on_board_date_proj1[0].date() - join_date[0].date()).days
+                        bench_days += (dt.datetime.now().date() - off_board_date_proj2[0].date()).days
+                        proj2_days = (off_board_date_proj2[0].date() - on_board_date_proj2[0].date()).days
+                        proj1_days = (off_board_date_proj1[0].date() - on_board_date_proj1[0].date()).days
+                    elif on_board_date_proj3[0] != 'None' and off_board_date_proj3[0] == "None":
+                        print('6th if')
+                        bench_days += (on_board_date_proj2[0].date() - off_board_date_proj1[0].date()).days
+                        bench_days += (on_board_date_proj1[0].date() - join_date[0].date()).days
+                        bench_days += (on_board_date_proj3[0].date() - off_board_date_proj2[0].date()).days
+                        status= "project3"
+                        proj2_days = (off_board_date_proj2[0].date() - on_board_date_proj2[0].date()).days
+                        proj1_days = (off_board_date_proj1[0].date() - on_board_date_proj1[0].date()).days
+                        proj3_days = (dt.datetime.now().date() - on_board_date_proj3[0].date()).days
+                    elif off_board_date_proj3[0] != "None":
+                        print('7th if')
+                        bench_days += (on_board_date_proj2[0].date() - off_board_date_proj1[0].date()).days
+                        bench_days += (on_board_date_proj1[0].date() - join_date[0].date()).days
+                        bench_days += (on_board_date_proj3[0].date() - off_board_date_proj2[0].date()).days
+                        bench_days += (dt.datetime.now().date() - off_board_date_proj3[0].date()).days
+                        proj2_days = (off_board_date_proj2[0].date() - on_board_date_proj2[0].date()).days
+                        proj1_days = (off_board_date_proj1[0].date() - on_board_date_proj1[0].date()).days
+                        proj3_days = (off_board_date_proj3[0].date() - on_board_date_proj3[0].date()).days
+                    else:
+                        print('else')
+                        pass
+                except Exception:
+                    print('Excepiton at if else blocks while bench days updating')
+                    #print('An erroe occured in if else block')
 
-print(proj1_goingon_names,'2----',proj2_goingon_names,'3---------',proj3_goingon_names)
-print(always_bench)
-# for i in indexs:
-#     if on_board_date_proj1[i] == "None":
-#         (name[i])
+                # data.at[i,'Bench Days']= int(bench_days)
 
+                #assigning data to the DataFrame
 
+                if join_date[0] != "None"   :
+                    #---------------------------------------------------------------------#
+                    # this is for utilization and tenure
+                    diff = relativedelta.relativedelta(dt.datetime.now() ,join_date[0])
+                    tenure_date=str(diff.years)+"y/"+str(diff.months)+"m/"+str(diff.days)+'d'
+                    tenure_days = (dt.datetime.now() - join_date[0]).days
+                    uti_days = proj1_days + proj2_days +proj3_days
+                    uti_per = (uti_days/tenure_days) * 100
+                    #-----------------------------------------------------------------------#
+                    data.at[i,'Total_Tenure'] =  tenure_date
+                    data.at[i,"Total_Utilization"]= str(round(uti_per))+"%"
+                    data.at[i, 'Bench Days'] = int(bench_days)
+                    data.at[i, 'Status'] = status
 
-obj = Update()
-
-
-def details(emp_inp, search_by):
-    emp_det = excel_data.loc[excel_data[search_by] == emp_inp]
-    on_board_date_proj1 = list(emp_det['Project1 Onboard'])
-    on_board_date_proj2 = list(emp_det['Project2 Onboard'])
-    on_board_date_proj3 = list(emp_det['Project3 Onboard'])
-    off_board_date_proj1 = list(emp_det['Project1 Offboarding'])
-    off_board_date_proj2 = list(emp_det['Project2 Offboarding'])
-    off_board_date_proj3 = list(emp_det['Project3 Offboarding'])
-    join_date = list(emp_det['Joining Date'])
-
-    bench_days = 0
-    proj1_days = 0
-    proj2_days = 0
-    proj3_days = 0
-    status = "Bench"
-    try:
-        if (join_date[0]) == 'None':
-            print('join date 0 if ')
-            st.error('Candidate was not Onboarded till now')
-
-        elif (on_board_date_proj1[0]) == "None":
-            print('1st if')
-            bench_days += (dt.datetime.now() - join_date[0]).days
-
-        elif (off_board_date_proj1[0]) == 'None' and (on_board_date_proj1[0]) != "None":
-            print('2nd if')
-            status = "Project 1"
-            proj1_days = (dt.datetime.now() - on_board_date_proj1[0]).days
-
-            # print(type(on_board_date_proj1[0]))
-            bench_days += (on_board_date_proj1[0] - join_date[0]).days
-        elif (off_board_date_proj1[0]) != "None" and (on_board_date_proj2[0]) == 'None':
-            print('3RD IF')
-            proj1_days = (off_board_date_proj1[0] - on_board_date_proj1[0]).days
-            bench_days += (dt.datetime.now() - off_board_date_proj1[0]).days
-            bench_days += (on_board_date_proj1[0] - join_date[0]).days()
-            # print(bench_days)
-        elif on_board_date_proj2[0] != "None" and off_board_date_proj2[0] == 'None':
-            print('4th if')
-            status = "Project 2"
-            proj1_days = (off_board_date_proj1[0] - on_board_date_proj1[0]).days
-            proj2_days = (dt.datetime.now() - on_board_date_proj2[0])
-            bench_days += (on_board_date_proj2[0] - off_board_date_proj1[0]).days
-            bench_days += (on_board_date_proj1[0] - join_date[0]).days
-        elif off_board_date_proj2[0] != 'None' and on_board_date_proj3[0] == 'None':
-            print('5th if')
-            # bench_days += dt.datetime.now() - off_board_date_proj2[0]
-            bench_days += (on_board_date_proj2[0].date() - off_board_date_proj1[0].date()).days
-            bench_days += (on_board_date_proj1[0].date() - join_date[0].date()).days
-            bench_days += (dt.datetime.now().date() - off_board_date_proj2[0].date()).days
-            proj2_days = (off_board_date_proj2[0].date() - on_board_date_proj2[0].date()).days
-            proj1_days = (off_board_date_proj1[0].date() - on_board_date_proj1[0].date()).days
-        elif on_board_date_proj3[0] != 'None' and off_board_date_proj3[0] == "None":
-            print('6th if')
-            bench_days += (on_board_date_proj2[0].date() - off_board_date_proj1[0].date()).days
-            bench_days += (on_board_date_proj1[0].date() - join_date[0].date()).days
-            bench_days += (on_board_date_proj3[0].date() - off_board_date_proj2[0].date()).days
-            proj2_days = (off_board_date_proj2[0].date() - on_board_date_proj2[0].date()).days
-            proj1_days = (off_board_date_proj1[0].date() - on_board_date_proj1[0].date()).days
-            proj3_days = (dt.datetime.now().date() - on_board_date_proj3[0].date()).days
-        elif off_board_date_proj3[0] != "None":
-            print('7th if')
-            bench_days += (on_board_date_proj2[0].date() - off_board_date_proj1[0].date()).days
-            bench_days += (on_board_date_proj1[0].date() - join_date[0].date()).days
-            bench_days += (on_board_date_proj3[0].date() - off_board_date_proj2[0].date()).days
-            bench_days += (dt.datetime.now().date() - off_board_date_proj3[0].date()).days
-            proj2_days = (off_board_date_proj2[0].date() - on_board_date_proj2[0].date()).days
-            proj1_days = (off_board_date_proj1[0].date() - on_board_date_proj1[0].date()).days
-            proj3_days = (off_board_date_proj3[0].date() - on_board_date_proj3[0].date()).days
-        else:
-            print('else')
-            pass
-    except Exception:
-        print(Exception)
-        print('An erroe occured in if else block')
-    st.write(emp_det)
-
-    lis = ['EmployeeName', 'EmployeeID']  # ,'Bench Days','Status']
-    for i in emp_det:
-        if i == 'Bench Days':
-            st.write((i), ":", int(bench_days))
-            st.write('Project1 days:', proj1_days)
-            st.write('Project2 days:', proj2_days)
-            st.write("Project3 days", proj3_days)
-            st.write('Status:', status)
-            break
-        else:
-            try:
-                if i in lis:
-                    st.write(i, ':', list(emp_det[i])[0])
-            except NameError:
-                print(NameError, 'Name not in lis')
-
-
-col1, col2, col3 = st.columns([5, 5, 5])
-with col1:
-    st.image(im)
-
-search_by_lis = ['EmployeeName', "EmployeeID",'Project1_Ongoing','Project2_Ongoing','Project3_Ongoing']
-
-search_by = st.selectbox('Search By', ('EmployeeName', "EmployeeID"))
-if search_by == 'EmployeeName':
-    emp_inp = st.selectbox("Enter Employee details", name)
-    if st.button('Submit'):
-        if (emp_inp not in name):
-            st.error('Please give proper input')
-        else:
-            details(emp_inp, search_by)
-    if st.button("Update All"):
-        try:
-            obj.all_col()
-            st.success('you updated all bench days')
-        except:
-            print('Exception in Bench days class calling')
-
-else:
-    emp_inp = st.selectbox("Enter Employee details", ids)
-    if st.button('Submit'):
-        if (emp_inp not in ids):
-            st.error('Please give proper input')
-        else:
-            details(emp_inp, search_by)
-    if st.button("Update All"):
-        try:
-            obj.all_col()
-            st.success('you updated all bench days')
-        except:
-            print('Exception in Bench days class calling')
+                else:
+                # assigning None value in empty cols
+                    data.at[i,'Tenure'] ="None"
+                    data.at[i, 'Utilization'] = "None"
+                    data.at[i,'Bench Days'] = "None"
+                    data.at[i, 'Status'] = "None"
+                    print('Add join date 1st to',emp_name)
 
 
 
-
-
-
+        #print(data.to_string())
+        # adding data Excel sheet
+        data.to_excel("demo2.xlsx",index=False)

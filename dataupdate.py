@@ -19,6 +19,7 @@ class Update:
                 emp_name = emp_names[i]
                 emp_det = data.loc[data["EmployeeName"] == emp_name]
 
+                # accessing cols from excel
 
                 on_board_date_proj1 = list(emp_det['Project1 Onboard'])
                 on_board_date_proj2 = list(emp_det['Project2 Onboard'])
@@ -34,6 +35,7 @@ class Update:
                 proj2_days = 0
                 proj3_days = 0
 
+                # check each codintion to get the EMP details who have been in which project
                 try:
                     if (join_date[0]) == 'None':
                         print('0 if ')
@@ -97,25 +99,33 @@ class Update:
                     #print('An erroe occured in if else block')
 
                 # data.at[i,'Bench Days']= int(bench_days)
+
+                #assigning data to the DataFrame
+
                 if join_date[0] != "None"   :
+                    #---------------------------------------------------------------------#
+                    # this is for utilization and tenure
                     diff = relativedelta.relativedelta(dt.datetime.now() ,join_date[0])
-                    tenure_date=str(diff.years)+"y/"+str(diff.months)+"m/"+str(diff.days)+'d'
+                    tenure_date=str(diff.years)+"y-"+str(diff.months)+"m-"+str(diff.days)+'d'
                     tenure_days = (dt.datetime.now() - join_date[0]).days
                     uti_days = proj1_days + proj2_days +proj3_days
                     uti_per = (uti_days/tenure_days) * 100
-                    data.at[i,'Tenure'] =  tenure_date
-                    data.at[i,"Utilization"]= str(round(uti_per))+"%"
+                    #-----------------------------------------------------------------------#
+                    data.at[i,'Total_Tenure'] =  tenure_date
+                    data.at[i,"Total_Utilization"]= str(round(uti_per))+"%"
                     data.at[i, 'Bench Days'] = int(bench_days)
                     data.at[i, 'Status'] = status
 
                 else:
-                    data.at[i,'Tenure'] ="None"
-                    data.at[i, 'Utilization'] = "None"
+                # assigning None value in empty cols
+                    data.at[i,'Total_Tenure'] ="None"
+                    data.at[i, 'Total_Tenure'] = "None"
                     data.at[i,'Bench Days'] = "None"
                     data.at[i, 'Status'] = "None"
-                    print('Add join date 1st')
+                    print('Add join date 1st to',emp_name)
 
 
-                # data.at[i,'Status'] = status
-        #print(data)
+
+        print(data.to_string())
+        # adding data Excel sheet
         data.to_excel("demo2.xlsx",index=False)
