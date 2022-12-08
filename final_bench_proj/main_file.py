@@ -144,7 +144,7 @@ def details(emp_inp, search_by,period_of_time):
     #------------------------------------------------------------#
     # to debug the code just commentout the print statements you can know which block of code excuted
 
-    times = ['Select Time', '21 H1', '21 H2', "22 H1", "22 H2"]
+    #times = ['Select Time', '21 H1', '21 H2', "22 H1", "22 H2"]
     # try:
     if (join_date[0]) == 'None':
         print('0 if ')
